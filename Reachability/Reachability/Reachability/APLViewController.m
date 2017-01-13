@@ -40,14 +40,17 @@
     /*
      Observe the kNetworkReachabilityChangedNotification. When that notification is posted, the method reachabilityChanged will be called.
      */
+    // 1、添加 kReachabilityChangedNotification 通知监听，以监听网络连接变化；
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
 
     //Change the host name here to change the server you want to monitor.
     NSString *remoteHostName = @"www.apple.com";
     NSString *remoteHostLabelFormatString = NSLocalizedString(@"Remote Host: %@", @"Remote host label format string");
     self.remoteHostLabel.text = [NSString stringWithFormat:remoteHostLabelFormatString, remoteHostName];
-    
+
+    // 2、 根据 www.apple.com 域名初始化一个 Reachability 对象，当然这里也可以通过 IP 地址来初始化；
 	self.hostReachability = [Reachability reachabilityWithHostName:remoteHostName];
+    // 3、开始网络连接状态监听
 	[self.hostReachability startNotifier];
 	[self updateInterfaceWithReachability:self.hostReachability];
 
@@ -60,6 +63,7 @@
 
 /*!
  * Called by Reachability whenever status changes.
+  5、当网络连接状态发生变化时，会根据全局通知回调此方法；
  */
 - (void) reachabilityChanged:(NSNotification *)note
 {
@@ -101,6 +105,7 @@
 
 - (void)configureTextField:(UITextField *)textField imageView:(UIImageView *)imageView reachability:(Reachability *)reachability
 {
+    // 4、在其他需要获取网络连接状态的地方调用 currentReachabilityStatus 方法
     NetworkStatus netStatus = [reachability currentReachabilityStatus];
     BOOL connectionRequired = [reachability connectionRequired];
     NSString* statusString = @"";
